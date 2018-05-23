@@ -57,14 +57,14 @@ Usage
 
 Simply point to any XML ruleset file and a folder:
 ```
-phpcs --extensions=php,inc,lib,module,info --standard=Drupal7Security /your/php/files/
+phpcs --extensions=php,inc,lib,module,info --standard=Drupal7Sec /your/php/files/
 ```
 
 Specifying extensions is important since for example PHP code is within .module files in Drupal.
 
 To have a quick example of output you can use the provided tests.php file:
 ```
-$ phpcs --extensions=php,inc,lib,module,info --standard=Drupal7Security.xml tests.php
+$ phpcs --extensions=php,inc,lib,module,info --standard=Drupal7Sec tests.php
 
 FILE: tests.php
 --------------------------------------------------------------------------------
