@@ -1,9 +1,7 @@
-phpcs-security-audit v2
-=======================
+# Drupal Security Audit
 
-About
------
-phpcs-security-audit is a set of [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) rules that finds vulnerabilities and weaknesses related to security in PHP code.
+## About
+drupal-security-audit is a set of [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) rules that finds vulnerabilities and weaknesses related to security in PHP code.
 
 It currently has core PHP rules as well as Drupal 7 specific rules.
 
@@ -11,32 +9,47 @@ The tool also checks for CVE issues and security advisories related to CMS/frame
 
 The main reason of this project for being an extension of PHP_CodeSniffer is to have easy integration into continuous integration systems. It is also able to find security bugs that are not detected with object oriented analysis (like in [RIPS](http://rips-scanner.sourceforge.net/) or [PHPMD](http://phpmd.org/)).
 
-phpcs-security-audit is backed by [Floe design + technologies](https://floedesign.ca/) and written by [Jonathan Marcil](https://twitter.com/jonathanmarcil).
+## Installation
 
-[<img src="https://floedesign.ca/img/thumbs/floe.jpg" alt="Floe design + technologies" width="100">](https://floedesign.ca/)
+First, make sure Composer is installed correctly:
 
+    which composer
 
-Install
--------
+If you get composer not found or similar, follow Composer's installation
+instructions.
 
-Requires [PHP CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/) version 3.x with PHP 5.4 or higher.
+Install Coder (8.x-2.x) in your global Composer directory in your home directory
+(`~/.composer`):
 
-Because of the way PHP CodeSniffer works, you need to put the `Security/` folder from phpcs-security-audit in `/usr/share/php/PHP/CodeSniffer/Standards` or do a symlink to it.
+    composer global require thereference/drupal-security-audit
 
-The easiest way to install is to git clone and use composer that will create the symlink for you:
-```
-composer install
-./vendor/bin/phpcs --standard=example_base_ruleset.xml tests.php
-```
+To make the `phpcs` and `phpcbf` commands available globally, add the Composer
+bin path to your `$PATH` variable in `~/.profile`, `~/.bashrc` or `~/.zshrc`:
 
-The package is also on [Packagist](https://packagist.org/packages/pheromone/phpcs-security-audit):
-```
-composer require pheromone/phpcs-security-audit
-sh vendor/pheromone/phpcs-security-audit/symlink.sh
-./vendor/bin/phpcs --standard=./vendor/pheromone/phpcs-security-audit/example_base_ruleset.xml ./vendor/pheromone/phpcs-security-audit/tests.php
-```
+    export PATH="$PATH:$HOME/.composer/vendor/bin"
 
-If you want to integrate it all with Jenkins, go see http://jenkins-php.org/ for extensive help.
+Register the Drupal and DrupalPractice Standard with PHPCS:
+
+    phpcs --config-set installed_paths ~/.composer/vendor/thereference/drupal-security-audit//coder_sniffer
+
+### Composer Installer Plugins
+
+The Coder package (>= 8.2.11) now works with Composer Installer Plugins,
+that find and register standards whenever packages are installed or updated.
+To use such a plugin within your project, follow these steps.
+
+    composer require --dev dealerdirect/phpcodesniffer-composer-installer
+    composer require --dev thereference/drupal-security-audit
+
+Now, you will see Drupal and DrupalPractice listed in the available PHP
+CodeSniffer standards.
+
+    vendor/bin/phpcs -i
+
+The same can be done for a Composer global installation.
+
+    composer global require dealerdirect/phpcodesniffer-composer-installer
+    composer global require thereference/drupal-security-audit
 
 
 Usage
@@ -44,14 +57,14 @@ Usage
 
 Simply point to any XML ruleset file and a folder:
 ```
-phpcs --extensions=php,inc,lib,module,info --standard=example_base_ruleset.xml /your/php/files/
+phpcs --extensions=php,inc,lib,module,info --standard=Drupal7Security /your/php/files/
 ```
 
 Specifying extensions is important since for example PHP code is within .module files in Drupal.
 
 To have a quick example of output you can use the provided tests.php file:
 ```
-$ phpcs --extensions=php,inc,lib,module,info --standard=example_base_ruleset.xml tests.php
+$ phpcs --extensions=php,inc,lib,module,info --standard=Drupal7Security.xml tests.php
 
 FILE: tests.php
 --------------------------------------------------------------------------------
