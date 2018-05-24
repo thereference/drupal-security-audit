@@ -1,11 +1,6 @@
 <?php
-namespace PHPCS_SecurityAudit\Sniffs\Drupal7;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Files\File;
-
-
-class UserInputWatchSniff implements Sniff {
+class UserInputWatchSniff implements PHP_CodeSniffer_Sniff {
 
 	/**
 	* Returns the token types that this sniff is interested in.
@@ -37,14 +32,14 @@ class UserInputWatchSniff implements Sniff {
 	/**
 	* Processes the tokens that this sniff is interested in.
 	*
-	* @param File $phpcsFile The file where the token was found.
+	* @param PHP_CodeSniffer_File $phpcsFile The file where the token was found.
 	* @param int                  $stackPtr  The position in the stack where
 	*                                        the token was found.
 	*
 	* @return void
 	*/
-	public function process(File $phpcsFile, $stackPtr) {
-		if (!\PHP_CodeSniffer\Config::getConfigData('ParanoiaMode')) return;
+	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+		if (!PHP_CodeSniffer::getConfigData('ParanoiaMode')) return;
 
 		$utils = new Utils();
 		$tokens = $phpcsFile->getTokens();

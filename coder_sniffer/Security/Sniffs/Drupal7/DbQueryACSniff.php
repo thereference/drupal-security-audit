@@ -1,11 +1,6 @@
 <?php
-namespace PHPCS_SecurityAudit\Sniffs\Drupal7;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Files\File;
-
-
-class DbQueryACSniff implements Sniff {
+class DbQueryACSniff implements PHP_CodeSniffer_Sniff {
 
 	/**
 	* Returns the token types that this sniff is interested in.
@@ -29,31 +24,31 @@ class DbQueryACSniff implements Sniff {
 	/**
 	* Processes the tokens that this sniff is interested in.
 	*
-	* @param File $phpcsFile The file where the token was found.
+	* @param PHP_CodeSniffer_File $phpcsFile The file where the token was found.
 	* @param int                  $stackPtr  The position in the stack where
 	*                                        the token was found.
 	*
 	* @return void
 	*/
-	public function process(File $phpcsFile, $stackPtr) {
+	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
 		$utils = new Utils();
 		if ($this->forceParanoia >= 0) {
 			$parano =  $this->forceParanoia ? 1 : 0;
 		} else {
-			$parano = \PHP_CodeSniffer\Config::getConfigData('ParanoiaMode') ? 1 : 0;
+			$parano = PHP_CodeSniffer::getConfigData('ParanoiaMode') ? 1 : 0;
 		}
 
 		$tokens = $phpcsFile->getTokens();
 		if ($tokens[$stackPtr]['content'] == 'db_query' || $tokens[$stackPtr]['content'] == 'db_query_range') {
 			$closer = $phpcsFile->findNext(T_SEMICOLON, $stackPtr);
-			$s = $phpcsFile->findNext(\PHP_CodeSniffer\Util\Tokens::$stringTokens, $stackPtr + 1, $closer);
+			$s = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$stringTokens, $stackPtr + 1, $closer);
 			if (preg_match('/{\s*(field_data|node|taxonony_term_data)\w*}/', $tokens[$s]['content'], $matches)) {
 				$phpcsFile->addWarning($tokens[$stackPtr]['content'] . ' should not be used with ' . $matches[0] . ' because access control modules won\'t be able to modify or extend your SQL query.', $s, 'D7DbQueryACWar');
 			}
 		}
 
 		if (in_array(str_replace("'", "", $tokens[$stackPtr]['content']), $utils::getACEntityTypes())) {
-			$s = $phpcsFile->findPrevious(\PHP_CodeSniffer\Util\Tokens::$stringTokens, $stackPtr - 1);
+			$s = $phpcsFile->findPrevious(PHP_CodeSniffer_Tokens::$stringTokens, $stackPtr - 1);
 			if ($tokens[$s]['content'] == "'entity_type'") {
 				// TODO refactor to not have to backtrace for defines, use $utils::addACEntityType
 			} elseif ($parano) {
@@ -68,10 +63,10 @@ class DbQueryACSniff implements Sniff {
 
 		if ($tokens[$stackPtr]['content'] == 'entityCondition') {
 			$closer = $phpcsFile->findNext(T_SEMICOLON, $stackPtr);
-			$s = $phpcsFile->findNext(\PHP_CodeSniffer\Util\Tokens::$stringTokens, $stackPtr + 1, $closer);
+			$s = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$stringTokens, $stackPtr + 1, $closer);
 			if ($tokens[$s]['content'] == "'entity_type'") {
 				$closer = $phpcsFile->findNext(T_CLOSE_PARENTHESIS, $s);
-				$s = $phpcsFile->findNext(array_merge(array(T_STRING), \PHP_CodeSniffer\Util\Tokens::$stringTokens), $s + 1, $closer);
+				$s = $phpcsFile->findNext(array_merge(array(T_STRING), PHP_CodeSniffer_Tokens::$stringTokens), $s + 1, $closer);
 				if ($s) {
 					$found = str_replace("'", "", $tokens[$s]['content']);
 					if (in_array($found, array_merge(self::$defines, $utils::getACEntityTypes()))) {
@@ -80,7 +75,7 @@ class DbQueryACSniff implements Sniff {
 						while ($s = $phpcsFile->findNext(T_STRING, $s + 1, $closer)) {
 							if ($tokens[$s]['content'] == 'addTag') {
 								$c = $phpcsFile->findNext(T_CLOSE_PARENTHESIS, $s);
-								$n = $phpcsFile->findNext(array_merge(array(T_STRING), \PHP_CodeSniffer\Util\Tokens::$stringTokens), $s + 1, $c);
+								$n = $phpcsFile->findNext(array_merge(array(T_STRING), PHP_CodeSniffer_Tokens::$stringTokens), $s + 1, $c);
 								$tag = str_replace("'", "", $tokens[$n]['content']);
 								if ($n && in_array($tag, array('node_access','entity_field_access','term_access'))) {
 									// This will not warn if wrong _access is used. Please warn anyways when paranoia is enforced.
@@ -100,14 +95,14 @@ class DbQueryACSniff implements Sniff {
 
 		if ($tokens[$stackPtr]['content'] == 'db_select') {
 			$closer = $phpcsFile->findNext(T_SEMICOLON, $stackPtr);
-			$s = $phpcsFile->findNext(\PHP_CodeSniffer\Util\Tokens::$stringTokens, $stackPtr + 1, $closer);
+			$s = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$stringTokens, $stackPtr + 1, $closer);
 			if (preg_match('/(field_data|node|taxonony_term_data)\w*/', $tokens[$s]['content'], $matches)) {
 				$closer = $phpcsFile->findNext(T_SEMICOLON, $s);
 				$warn = true;
 				while ($s = $phpcsFile->findNext(T_STRING, $s + 1, $closer)) {
 					if ($tokens[$s]['content'] == 'addTag') {
 						$c = $phpcsFile->findNext(T_CLOSE_PARENTHESIS, $s);
-						$n = $phpcsFile->findNext(array_merge(array(T_STRING), \PHP_CodeSniffer\Util\Tokens::$stringTokens), $s + 1, $c);
+						$n = $phpcsFile->findNext(array_merge(array(T_STRING), PHP_CodeSniffer_Tokens::$stringTokens), $s + 1, $c);
 						$tag = str_replace("'", "", $tokens[$n]['content']);
 						if ($n && in_array($tag, array('node_access','entity_field_access','term_access'))) {
 							// This will not warn if wrong _access is used. Please warn anyways when paranoia is enforced.

@@ -1,11 +1,6 @@
 <?php
-namespace PHPCS_SecurityAudit\Sniffs\Drupal7;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Files\File;
-
-
-class AdvisoriesContribSniff implements Sniff {
+class AdvisoriesContribSniff implements PHP_CodeSniffer_Sniff {
 
 	/**
 	* Returns the token types that this sniff is interested in.
@@ -19,20 +14,20 @@ class AdvisoriesContribSniff implements Sniff {
 	/**
 	* Processes the tokens that this sniff is interested in.
 	*
-	* @param File $phpcsFile The file where the token was found.
+	* @param PHP_CodeSniffer_File $phpcsFile The file where the token was found.
 	* @param int                  $stackPtr  The position in the stack where
 	*                                        the token was found.
 	*
 	* @return void
 	*/
-	public function process(File $phpcsFile, $stackPtr) {
+	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
 		if ($stackPtr > 0)
 			return;
 		$dversion = '7';
         $fileName  = $phpcsFile->getFileName();
 		if (!preg_match('/\.info$/', $fileName))
 			return;
-		$utils = \PHPCS_SecurityAudit\Sniffs\UtilsFactory::getInstance('Drupal7');
+		$utils = PHPCS_SecurityAudit\Sniffs\UtilsFactory::getInstance('Drupal7');
 		$tokens = $phpcsFile->getTokens();
 
 		$info = $utils->drupal_parse_info_format(file_get_contents($fileName));

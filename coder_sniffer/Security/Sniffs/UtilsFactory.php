@@ -3,7 +3,7 @@ namespace PHPCS_SecurityAudit\Sniffs;
 class UtilsFactory {
 
 	public static function getInstance() {
-		$cmsframework = \PHP_CodeSniffer\Config::getConfigData('CmsFramework');
+		$cmsframework = PHP_CodeSniffer::getConfigData('CmsFramework');
 		if (isset($cmsframework)) {
 			$utilsclass = '\\PHPCS_SecurityAudit\\Sniffs\\'.$cmsframework.'\\Utils';
 			if (class_exists($utilsclass)) {

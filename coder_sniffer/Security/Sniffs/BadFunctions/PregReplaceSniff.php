@@ -1,11 +1,6 @@
 <?php
-namespace PHPCS_SecurityAudit\Sniffs\BadFunctions;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Files\File;
-
-
-class PregReplaceSniff implements Sniff  {
+class PregReplaceSniff implements PHP_CodeSniffer_Sniff  {
 
 	/**
 	* Returns the token types that this sniff is interested in.
@@ -19,20 +14,20 @@ class PregReplaceSniff implements Sniff  {
 	/**
 	* Processes the tokens that this sniff is interested in.
 	*
-	* @param File $phpcsFile The file where the token was found.
+	* @param PHP_CodeSniffer_File $phpcsFile The file where the token was found.
 	* @param int                  $stackPtr  The position in the stack where
 	*                                        the token was found.
 	*
 	* @return void
 	*/
-	public function process(File $phpcsFile, $stackPtr) {
-		$utils = \PHPCS_SecurityAudit\Sniffs\UtilsFactory::getInstance();
+	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+		$utils = PHPCS_SecurityAudit\Sniffs\UtilsFactory::getInstance();
 
 		$tokens = $phpcsFile->getTokens();
 		if ($tokens[$stackPtr]['content'] == 'preg_replace') {
 			$s = $phpcsFile->findNext(T_OPEN_PARENTHESIS, $stackPtr);
 			$closer = $tokens[$s]['parenthesis_closer'];
-			$s = $phpcsFile->findNext(\PHP_CodeSniffer\Util\Tokens::$emptyTokens, $s + 1, $closer, true);
+			$s = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $s + 1, $closer, true);
 			if ($tokens[$s]['code'] == T_CONSTANT_ENCAPSED_STRING) {
 				$pattern = $tokens[$s]['content'];
 				if (substr($pattern, 1, 1) === '/') {

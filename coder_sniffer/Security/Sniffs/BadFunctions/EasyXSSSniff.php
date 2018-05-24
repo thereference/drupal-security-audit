@@ -1,11 +1,6 @@
 <?php
-namespace PHPCS_SecurityAudit\Sniffs\BadFunctions;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Files\File;
-
-
-class EasyXSSSniff implements Sniff {
+class EasyXSSSniff implements PHP_CodeSniffer_Sniff {
 
 	/**
 	* Returns the token types that this sniff is interested in.
@@ -26,21 +21,21 @@ class EasyXSSSniff implements Sniff {
 	/**
 	* Processes the tokens that this sniff is interested in.
 	*
-	* @param File $phpcsFile The file where the token was found.
+	* @param PHP_CodeSniffer_File $phpcsFile The file where the token was found.
 	* @param int                  $stackPtr  The position in the stack where
 	*                                        the token was found.
 	*
 	* @return void
 	*/
-	public function process(File $phpcsFile, $stackPtr) {
-		$utils = \PHPCS_SecurityAudit\Sniffs\UtilsFactory::getInstance();
+	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+		$utils = PHPCS_SecurityAudit\Sniffs\UtilsFactory::getInstance();
 		if ($this->forceParanoia >= 0) {
 			$parano =  $this->forceParanoia ? 1 : 0;
 		} else {
-			$parano = \PHP_CodeSniffer\Config::getConfigData('ParanoiaMode') ? 1 : 0;
+			$parano = PHP_CodeSniffer::getConfigData('ParanoiaMode') ? 1 : 0;
 		}
 		$tokens = $phpcsFile->getTokens();
-		$s = $phpcsFile->findNext(\PHP_CodeSniffer\Util\Tokens::$emptyTokens, $stackPtr, null, true, null, true);
+		$s = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $stackPtr, null, true, null, true);
 
 		if ($tokens[$stackPtr]['code'] == T_OPEN_TAG_WITH_ECHO) {
 			$closer = $phpcsFile->findNext(T_CLOSE_TAG, $stackPtr);
@@ -53,7 +48,7 @@ class EasyXSSSniff implements Sniff {
 
 		$warn = false;
 		while ($s) {
-			$s = $phpcsFile->findNext(array_merge(\PHP_CodeSniffer\Util\Tokens::$emptyTokens, \PHP_CodeSniffer\Util\Tokens::$bracketTokens, \PHPCS_SecurityAudit\Sniffs\Utils::$staticTokens), $s + 1, $closer, true);
+			$s = $phpcsFile->findNext(array_merge(PHP_CodeSniffer_Tokens::$emptyTokens, PHP_CodeSniffer_Tokens::$bracketTokens, PHPCS_SecurityAudit\Sniffs\Utils::$staticTokens), $s + 1, $closer, true);
 			if ($s && $utils::is_token_user_input($tokens[$s])) {
 				$phpcsFile->addError('Easy XSS detected because of direct user input with ' . $tokens[$s]['content'] . ' on ' . $tokens[$stackPtr]['content'], $s, 'EasyXSSerr');
 			} elseif ($s && $utils::is_XSS_mitigation($tokens[$s]['content'])) {

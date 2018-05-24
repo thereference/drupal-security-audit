@@ -1,11 +1,6 @@
 <?php
-namespace PHPCS_SecurityAudit\Sniffs\Drupal7;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Files\File;
-
-
-class DynQueriesSniff implements Sniff {
+class DynQueriesSniff implements PHP_CodeSniffer_Sniff {
 
 	/**
 	* Returns the token types that this sniff is interested in.
@@ -19,13 +14,13 @@ class DynQueriesSniff implements Sniff {
 	/**
 	* Processes the tokens that this sniff is interested in.
 	*
-	* @param File $phpcsFile The file where the token was found.
+	* @param PHP_CodeSniffer_File $phpcsFile The file where the token was found.
 	* @param int                  $stackPtr  The position in the stack where
 	*                                        the token was found.
 	*
 	* @return void
 	*/
-	public function process(File $phpcsFile, $stackPtr) {
+	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
 		$utils = new Utils();
 
 		$tokens = $phpcsFile->getTokens();
@@ -70,14 +65,14 @@ class DynQueriesSniff implements Sniff {
 			$already = FALSE;
 			$next = false;
 			while ($s < $closer) {
-				$s = $phpcsFile->findNext(\PHP_CodeSniffer\Util\Tokens::$emptyTokens, $s + 1, $closer, true);
+				$s = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $s + 1, $closer, true);
 				if (!$s) {
 					break;
 				}
 				if ($tokens[$stackPtr]['content'] == 'fields' && ($tokens[$s]['content'] == 'array' || $next)) {
 					$next = $phpcsFile->findNext(T_DOUBLE_ARROW, $s + 1, $closer);
 					if ($next) {
-						$s = $phpcsFile->findPrevious(\PHP_CodeSniffer\Util\Tokens::$emptyTokens, $next - 1, null, true);
+						$s = $phpcsFile->findPrevious(PHP_CodeSniffer_Tokens::$emptyTokens, $next - 1, null, true);
 						if (is_numeric($paramnum)) {
 							$paramnum .= ' with array key value';
 						}
@@ -95,7 +90,7 @@ class DynQueriesSniff implements Sniff {
 				}
 			}
 
-			if ($warn && \PHP_CodeSniffer\Config::getConfigData('ParanoiaMode')) {
+			if ($warn && PHP_CodeSniffer::getConfigData('ParanoiaMode')) {
 				$phpcsFile->addWarning('Potential SQL injection in ' . $tokens[$stackPtr]['content'] . " with param #$paramnum", $stackPtr, 'D7DynQueriesWarn');
 			}
 		}

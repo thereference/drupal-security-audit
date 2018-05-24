@@ -1,11 +1,6 @@
 <?php
-namespace PHPCS_SecurityAudit\Sniffs\Misc;
 
-use PHP_CodeSniffer\Sniffs\Sniff;
-use PHP_CodeSniffer\Files\File;
-
-
-class BadCorsHeaderSniff implements Sniff  {
+class BadCorsHeaderSniff implements PHP_CodeSniffer_Sniff  {
 	/**
 	* Returns the token types that this sniff is interested in.
 	*
@@ -18,18 +13,18 @@ class BadCorsHeaderSniff implements Sniff  {
 	/**
 	* Processes the tokens that this sniff is interested in.
 	*
-	* @param File $phpcsFile The file where the token was found.
+	* @param PHP_CodeSniffer_File $phpcsFile The file where the token was found.
 	* @param int                  $stackPtr  The position in the stack where
 	*                                        the token was found.
 	*
 	* @return void
 	*/
-	public function process(File $phpcsFile, $stackPtr) {
-		$utils = \PHPCS_SecurityAudit\Sniffs\UtilsFactory::getInstance();
+	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+		$utils = PHPCS_SecurityAudit\Sniffs\UtilsFactory::getInstance();
 		$tokens = $phpcsFile->getTokens();
 		if (stristr($tokens[$stackPtr]['content'], 'Access-Control-Allow-Origin')) {
 			$closer = $phpcsFile->findNext(T_CLOSE_PARENTHESIS, $stackPtr);
-			$s = $phpcsFile->findNext(\PHP_CodeSniffer\Util\Tokens::$stringTokens, $stackPtr + 1, $closer);
+			$s = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$stringTokens, $stackPtr + 1, $closer);
 			if ($s && stristr($tokens[$s]['content'], '*')) {
 				$phpcsFile->addWarning('Bad CORS header detected.', $stackPtr, 'WarnPCKS1Crypto');
 			}
@@ -51,7 +46,7 @@ class BadCorsHeaderSniff implements Sniff  {
 				}
 			} else {
 				// Only warn on crypto functions in paranoia mode
-				if (\PHP_CodeSniffer\Config::getConfigData('ParanoiaMode')) {
+				if (PHP_CodeSniffer::getConfigData('ParanoiaMode')) {
 					$phpcsFile->addWarning('Crypto function ' . $tokens[$stackPtr]['content'] . ' used.', $stackPtr, 'WarnCryptoFunc');
 				}
 			}
